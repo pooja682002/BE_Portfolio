@@ -1,82 +1,113 @@
 package com.example.portfoliotask_backend.controller;
 
-import com.example.portfoliotask_backend.dto.AdminDTO;
-import com.example.portfoliotask_backend.model.Admin;
-import com.example.portfoliotask_backend.service.AdminService;
+import com.example.portfoliotask_backend.dto.UserDTO;
+import com.example.portfoliotask_backend.model.User;
+import com.example.portfoliotask_backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.Optional;
+import java.util.UUID;
+
 
 import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/admin")
-@CrossOrigin(origins = "*")
-public class AdminController {
+@RequestMapping("api/users")
+@CrossOrigin(origins = "http://localhost:3000")
+public class UserController {
 
     @Autowired
-    private AdminService adminService;
+    private UserService adminService;
 
     @PostMapping("/register")
-    public ResponseEntity<Object> registerAdmin(@RequestBody AdminDTO adminDTO) {
+    public ResponseEntity<Object> registerAdmin(@RequestBody UserDTO adminDTO) {
         String result = adminService.registerAdmin(adminDTO);
 
         if (result.equals("User already exists")) {
-            return ResponseEntity.status(400).body(new ResponseMessage(400, "Admin already exists", null));
+            return ResponseEntity.status(400).body(
+                    new ResponseMessage(400, "User already exists", null));
         } else if (result.equals("User registered successfully")) {
-            return ResponseEntity.status(201).body(new ResponseMessage(201, "Admin registered successfully", adminDTO));
+            return ResponseEntity.status(201).body(
+                    new ResponseMessage(201, "User registered successfully", adminDTO));
         } else {
-            return ResponseEntity.status(500).body(new ResponseMessage(500, "Something went wrong", null));
+            return ResponseEntity.status(500).body(
+                    new ResponseMessage(500, "Something went wrong", null));
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Object> loginAdmin() {
-        return ResponseEntity.ok(new ResponseMessage(200, "Login Successful", null));
+    public ResponseEntity<Object> loginAdmin(@RequestBody UserDTO userDTO, HttpServletRequest request) {
+        boolean isValidUser = adminService.loginAdmin(userDTO.getUsername(), userDTO.getPassword());
+
+        if (isValidUser) {
+            // Set session flag
+            request.getSession().setAttribute("isLoggedIn", 1);
+            return ResponseEntity.ok(new ResponseMessage(200, "Login Successful", null));
+        } else {
+            return ResponseEntity.status(401).body(new ResponseMessage(401, "Invalid credentials", null));
+        }
     }
+
 
     @GetMapping
-    public ResponseEntity<Object> getAllAdmins() {
-        return ResponseEntity.ok(new ResponseMessage(200, "Admins fetched successfully", adminService.getAllAdmins()));
+    public ResponseEntity<Object> getAllUsers() {
+        return ResponseEntity.ok(new ResponseMessage(200, "Users fetched successfully", adminService.getAllUsers()));
     }
+
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getAdminById(@PathVariable UUID id) {
-        Optional<Admin> admin = adminService.getAdminById(id);
+    public ResponseEntity<Object> getUserById(@PathVariable UUID id) {
+        Optional<User> user = adminService.getUserById(id);
 
-        if (admin.isPresent()) {
-            return ResponseEntity.ok(new ResponseMessage(200, "Admin fetched successfully", admin.get()));
+        if (user.isPresent()) {
+            return ResponseEntity.status(200).body(
+                    new ResponseMessage(200, "User fetched successfully", user.get()));
         } else {
-            return ResponseEntity.status(404).body(new ResponseMessage(404, "Admin not found", null));
+            return ResponseEntity.status(404).body(
+                    new ResponseMessage(404, "User not found", null));
         }
     }
+
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateAdmin(@PathVariable UUID id, @RequestBody AdminDTO adminDTO) {
-        String result = adminService.updateAdmin(id, adminDTO);
+    public ResponseEntity<Object> updateUser(@PathVariable UUID id, @RequestBody UserDTO adminDTO) {
+        String result = adminService.updateUser(id, adminDTO);
 
-        if (result.equals("Admin not found")) {
-            return ResponseEntity.status(404).body(new ResponseMessage(404, "Admin not found", null));
-        } else if (result.equals("Admin updated successfully")) {
-            return ResponseEntity.ok(new ResponseMessage(200, "Admin updated successfully", adminDTO));
+        if (result.equals("User not found")) {
+            return ResponseEntity.status(404).body(
+                    new ResponseMessage(404, "User not found", null));
+        } else if (result.equals("User updated successfully")) {
+            return ResponseEntity.status(200).body(
+                    new ResponseMessage(200, "User updated successfully", adminDTO));
         } else {
-            return ResponseEntity.status(500).body(new ResponseMessage(500, "Something went wrong", null));
+            return ResponseEntity.status(500).body(
+                    new ResponseMessage(500, "Something went wrong", null));
         }
     }
+
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteAdmin(@PathVariable UUID id) {
-        String result = adminService.deleteAdmin(id);
+    public ResponseEntity<Object> deleteUser(@PathVariable UUID id) {
+        String result = adminService.deleteUser(id);
 
-        if (result.equals("Admin not found")) {
-            return ResponseEntity.status(404).body(new ResponseMessage(404, "Admin not found", null));
-        } else if (result.equals("Admin deleted successfully")) {
-            return ResponseEntity.ok(new ResponseMessage(200, "Admin deleted successfully", null));
+        if (result.equals("User not found")) {
+            return ResponseEntity.status(404).body(
+                    new ResponseMessage(404, "User not found", null));
+        } else if (result.equals("User deleted successfully")) {
+            return ResponseEntity.status(200).body(
+                    new ResponseMessage(200, "User deleted successfully", null));
         } else {
-            return ResponseEntity.status(500).body(new ResponseMessage(500, "Something went wrong", null));
+            return ResponseEntity.status(500).body(
+                    new ResponseMessage(500, "Something went wrong", null));
         }
     }
+
 
     public static class ResponseMessage {
         private int statusCode;

@@ -5,8 +5,8 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name= "admin")
-public class Admin {
+@Table(name= "users")
+public class User {
     @Id
 
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,10 +19,10 @@ public class Admin {
     private String password;
 
 
-    public Admin(){}
+    public User(){}
 
 
-    public Admin(UUID id, String username, String password) {
+    public User(UUID id, String username, String password) {
         this.id = id;
         this.username = username;
         this.password = password;

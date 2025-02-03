@@ -1,31 +1,30 @@
 package com.example.portfoliotask_backend.service;
 
-
-import com.example.portfoliotask_backend.model.Admin;
-import com.example.portfoliotask_backend.repository.AdminRepo;
+import com.example.portfoliotask_backend.model.User;
+import com.example.portfoliotask_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 
+import java.util.Collections;
+
 @Service
-public class AdminDetailsService implements UserDetailsService {
+public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
 
     @Autowired
-    private AdminRepo adminRepo;
+    private UserRepository adminRepo;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Admin admin = adminRepo.findByUsername(username);
+        User admin = adminRepo.findByUsername(username);
         if (admin == null) {
             throw new UsernameNotFoundException("User not found");
         }
 
-        // Return UserDetails object with admin credentials
-        return new User(admin.getUsername(), admin.getPassword(), Collections.emptyList());
+
+        return new org.springframework.security.core.userdetails.User(admin.getUsername(), admin.getPassword(), Collections.emptyList());
     }
 }

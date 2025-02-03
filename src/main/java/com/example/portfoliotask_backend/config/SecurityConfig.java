@@ -1,6 +1,7 @@
 package com.example.portfoliotask_backend.config;
 
-import com.example.portfoliotask_backend.service.AdminDetailsService;
+import com.example.portfoliotask_backend.service.UserDetailsService;
+import com.example.portfoliotask_backend.service.UserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +25,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(AdminDetailsService adminDetailsService) {
+    public AuthenticationProvider authenticationProvider(UserDetailsService adminDetailsService) {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(adminDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder()); // Ensure password comparison is done properly
@@ -42,7 +43,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for API
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/admin/register", "/api/admin/login",
+                                "/api/users/register", "/api/users/login","/api/users" ,"/api/users/{id}",
 
                                 // Skills Endpoints
                                 "/api/skills", "/api/skills/{id}",
